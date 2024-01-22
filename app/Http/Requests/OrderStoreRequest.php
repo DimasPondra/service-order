@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\CheckCourse;
+use App\Rules\CheckUser;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderStoreRequest extends FormRequest
@@ -22,9 +24,8 @@ class OrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price' => 'required|integer|gte:1',
-            'user_id' => 'required|integer',
-            'course_id' => 'required|integer'
+            'user_id' => ['required', 'integer', new CheckUser],
+            'course_id' => ['required', 'integer', new CheckCourse]
         ];
     }
 }

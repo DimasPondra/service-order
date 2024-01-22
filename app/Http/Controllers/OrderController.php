@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ClientHelper;
 use App\Http\Requests\OrderStoreRequest;
 use App\Models\Order;
 use App\Repositories\OrderRepository;
@@ -33,15 +34,22 @@ class OrderController extends Controller
         try {
             DB::beginTransaction();
 
+            $course = ClientHelper::getCourseByID($request->course_id);
+            $customCode = "ORD-" . rand(0,9999) . "-SO-" . date('dHis');
+
             $request->merge([
-                'code' => 'code-custom',
-                'payment_url' => 'url_midtrans'
+                'price' => floatval($course['data']['price']),
+                'code' => $customCode,
             ]);
 
-            $data = $request->only(['price', 'code', 'payment_url', 'user_id', 'course_id']);
+            $data = $request->only(['price', 'code', 'user_id', 'course_id']);
 
             $order = new Order();
             $this->orderRepository->save($order->fill($data));
+
+            /** proses simpan ke midtrans dan mendapatkan payment url */
+
+            /** update data order dan simpan payment url dari midtrans */
 
             DB::commit();
         } catch (\Throwable $th) {
