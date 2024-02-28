@@ -8,6 +8,8 @@ use App\Models\Order;
 use App\Repositories\OrderRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class OrderController extends Controller
 {
@@ -42,14 +44,28 @@ class OrderController extends Controller
                 'code' => $customCode,
             ]);
 
-            $data = $request->only(['price', 'code', 'user_id', 'course_id']);
-
-            $order = new Order();
-            $this->orderRepository->save($order->fill($data));
-
             /** proses simpan ke midtrans dan mendapatkan payment url */
+            Config::$serverKey = config('services.midtrans.serverKey');
+            Config::$isProduction = config('services.midtrans.isProduction');
+            Config::$isSanitized = config('services.midtrans.isSanitized');
+            Config::$is3ds = config('services.midtrans.is3ds');
+
+            $midtrans = [
+                'transaction_details' => [
+                    'order_id' => $customCode,
+                    'gross_amount' => $request->price,
+                ],
+            ];
+
+            $paymentUrl = Snap::createTransaction($midtrans)->redirect_url;
 
             /** update data order dan simpan payment url dari midtrans */
+            $request->merge(['payment_url' => $paymentUrl]);
+
+            $data = $request->only(['price', 'code', 'payment_url', 'user_id', 'course_id']);
+
+            $order = new Order();
+            $order = $this->orderRepository->save($order->fill($data));
 
             DB::commit();
         } catch (\Throwable $th) {
@@ -63,7 +79,10 @@ class OrderController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Order successfully created.'
+            'message' => 'Order successfully created.',
+            'data' => [
+                'payment_url' => $paymentUrl
+            ]
         ], 201);
     }
 
