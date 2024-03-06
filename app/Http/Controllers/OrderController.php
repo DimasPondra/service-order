@@ -37,6 +37,14 @@ class OrderController extends Controller
             DB::beginTransaction();
 
             $course = ClientHelper::getCourseByID($request->course_id);
+
+            if ($course['data']['status'] !== 'pending') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Can't take this course, because it hasn't been released yet."
+                ], 400);
+            }
+
             $customCode = "ORD-" . rand(0,9999) . "-SO-" . date('dHis');
 
             $request->merge([
