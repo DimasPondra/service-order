@@ -45,4 +45,23 @@ class ClientHelper
             return null;
         }
     }
+
+    public static function giveCourseAccessToUser($courseID, $userID)
+    {
+        try {
+            $url = env("URL_SERVICE_COURSE") . "/my-courses/";
+            $response = Http::timeout(5)->post($url, [
+                'course_id' => $courseID,
+                'user_id' => $userID
+            ]);
+
+            if ($response->status == 201) {
+                return true;
+            }
+
+            return false;
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
 }
