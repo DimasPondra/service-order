@@ -49,8 +49,8 @@ class ClientHelper
     public static function giveCourseAccessToUser($courseID, $userID)
     {
         try {
-            $url = env("URL_SERVICE_COURSE") . "/my-courses/";
-            $response = Http::timeout(5)->post($url, [
+            $url = env("URL_SERVICE_COURSE") . "/my-courses/store";
+            $response = Http::post($url, [
                 'course_id' => $courseID,
                 'user_id' => $userID
             ]);
