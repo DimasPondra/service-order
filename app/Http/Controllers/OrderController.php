@@ -38,7 +38,7 @@ class OrderController extends Controller
 
             $course = ClientHelper::getCourseByID($request->course_id);
 
-            if ($course['data']['status'] !== 'pending') {
+            if ($course['data']['status'] !== 'published') {
                 return response()->json([
                     'status' => 'error',
                     'message' => "Can't take this course, because it hasn't been released yet."
