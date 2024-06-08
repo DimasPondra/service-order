@@ -74,4 +74,4 @@ Mulai server
 php artisan serve --port=8083
 ```
 
-Dengan mengikuti langkah-langkah di atas, Anda akan dapat menjalankan Service course dimana service tersebut bagian dari aplikasi belajar online (kelas digital) microservice.
+Dengan mengikuti langkah-langkah di atas, Anda akan dapat menjalankan Service order dimana service tersebut bagian dari aplikasi belajar online (kelas digital) microservice.
